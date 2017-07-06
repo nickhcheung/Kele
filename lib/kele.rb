@@ -20,4 +20,12 @@ class Kele
 
     @user_data = JSON.parse(response.body)
   end
+
+  def get_mentor_availability(mentor_id)
+    response = self.class.get(@base_api_url + "/mentors/#{mentor_id}/student_availability", headers: { "authorization" => @auth_token })
+
+    raise "Unable to retrieve mentor's availability" unless response.code == 200
+
+    @mentor_availability = JSON.parse(response.body)
+  end
 end
