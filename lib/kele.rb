@@ -1,4 +1,5 @@
 require "httparty"
+require "json"
 
 class Kele
   include HTTParty
@@ -10,5 +11,13 @@ class Kele
     raise "Invalid email or password" unless response.code == 200
 
     @auth_token = response["auth_token"]
+  end
+
+  def get_me
+    response = self.class.get(@base_api_url + '/users/me', headers: { "authorization" => @auth_token })
+
+    raise "Unable to retrieve User Data" unless response.code == 200
+
+    @user_data = JSON.parse(response.body)
   end
 end
