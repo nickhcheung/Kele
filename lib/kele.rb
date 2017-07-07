@@ -7,6 +7,7 @@ class Kele
   include Roadmap
 
   def initialize(email, password)
+    @email = email
     @base_api_url = "https://www.bloc.io/api/v1"
     response = self.class.post(@base_api_url + "/sessions", body: { "email": email, "password": password })
 
@@ -29,5 +30,33 @@ class Kele
     raise "Unable to retrieve mentor's availability" unless response.code == 200
 
     @mentor_availability = JSON.parse(response.body)
+  end
+
+  def get_messages(page = nil)
+    if page
+      response = self.class.get(@base_api_url + "/message_threads", body: { "page": page }, headers: { "authorization" => @auth_token })
+    else
+      response = self.class.get(@base_api_url + "/message_threads", headers: { "authorization" => @auth_token })
+    end
+
+    raise "Unable to retrieve messages" unless response.code == 200
+
+    @messages = JSON.parse(response.body)
+  end
+
+  def create_message(mentor_id, message)
+    options = {
+      "sender": @email,
+      "recipient_id": mentor_id,
+      "stripped-text": message
+    }
+
+    response = self.class.post(@base_api_url + "/messages", body: options, headers: { "authorization" => @auth_token })
+
+    raise "Unable to send message" unless response.code == 200
+
+    if response.success?
+      puts "message sent!"
+    end
   end
 end
