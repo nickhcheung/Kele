@@ -59,4 +59,22 @@ class Kele
       puts "message sent!"
     end
   end
+
+  def create_submission(enrollment_id, checkpoint_id, assignment_branch, assignment_commit_link, comment)
+    options = {
+      "assignment_branch": assignment_branch,
+      "assignment_commit_link": assignment_commit_link,
+      "checkpoint_id": checkpoint_id,
+      "comment": comment,
+      "enrollment_id": enrollment_id
+    }
+
+    response = self.class.post(@base_api_url + "/checkpoint_submissions", body: options, headers: { "authorization" => @auth_token })
+
+    raise "Unable to submit checkpoint" unless response.code == 200
+
+    if response.success?
+      puts "Checkpoint Submitted!"
+    end
+  end
 end
